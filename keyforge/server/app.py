@@ -109,3 +109,20 @@ if dashboard_dir.exists():
 @app.get("/", include_in_schema=False)
 async def root_redirect():
     return RedirectResponse(url="/docs")
+
+
+@app.get("/api/docs", include_in_schema=False)
+async def api_docs():
+    from fastapi.openapi.docs import get_swagger_ui_html
+    return get_swagger_ui_html(openapi_url="/api/openapi.json", title="KeyForge API Documentation")
+
+
+@app.get("/api/redoc", include_in_schema=False)
+async def api_redoc():
+    from fastapi.openapi.docs import get_redoc_html
+    return get_redoc_html(openapi_url="/api/openapi.json", title="KeyForge ReDoc")
+
+
+@app.get("/api/openapi.json", include_in_schema=False)
+async def api_openapi():
+    return app.openapi()

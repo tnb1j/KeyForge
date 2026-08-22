@@ -1,20 +1,16 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
       "source": "/docs",
-      "destination": "/api"
+      "destination": "/api/docs"
     },
     {
       "source": "/redoc",
-      "destination": "/api"
+      "destination": "/api/redoc"
     },
     {
       "source": "/openapi.json",
-      "destination": "/api"
+      "destination": "/api/openapi.json"
     },
     {
       "source": "/dashboard",
