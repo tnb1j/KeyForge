@@ -13,6 +13,13 @@ if ("VERCEL" in os.environ or "AWS_LAMBDA_FUNCTION_NAME" in os.environ) and "KEY
     os.environ["KEYFORGE_DB_URL"] = "sqlite:////tmp/keyforge.db"
 
 from keyforge.server.app import app
+from keyforge.server.db.database import init_db
+
+# Initialize database schema and seeds on serverless cold start
+try:
+    init_db()
+except Exception as e:
+    print(f"Warning: init_db failed on startup: {e}")
 
 # Vercel ASGI handler expects 'app'
 __all__ = ["app"]
