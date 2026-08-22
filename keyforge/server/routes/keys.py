@@ -25,18 +25,32 @@ def list_public_keys(db: Session = Depends(get_db)):
 def get_active_product_key(product_id: str, db: Session = Depends(get_db)):
     """Retrieve the current active public verification key for a given product."""
     product = db.query(ProductModel).filter_by(id=product_id).first()
-    if not product or not product.active_key_id:
+    if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No active signing key found for product '{product_id}'",
+            detail=f"Product '{product_id}' not found",
         )
 
-    key = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
+    key = None
+    if product.active_key_id:
+        key = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
+
     if not key:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Signing key record missing from vault",
+        keypair = generate_keypair(version=1, key_id=f"key-v1-{product.id}-auto")
+        key = SigningKeyModel(
+            key_id=keypair.key_id,
+            product_id=product.id,
+            version=1,
+            algorithm="Ed25519",
+            public_key_pem=keypair.public_key_pem,
+            public_key_hex=keypair.public_key_hex,
+            private_key_pem=keypair.private_key_pem or "",
+            fingerprint=keypair.fingerprint,
+            status="active",
         )
+        product.active_key_id = keypair.key_id
+        db.add(key)
+        db.commit()
 
     return key.to_public_dict()
 

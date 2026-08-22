@@ -144,19 +144,27 @@ def issue_license(
 
     profile = ProductProfile.from_dict(json.loads(product.profile_json))
 
-    # Resolve signing key
-    if not product.active_key_id:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"No active signing key configured for product '{req.product_id}'",
-        )
+    # Resolve signing key (auto-recover if missing from database vault)
+    key_record = None
+    if product.active_key_id:
+        key_record = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
 
-    key_record = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
     if not key_record:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Signing key record missing",
+        keypair = generate_keypair(version=1, key_id=f"key-v1-{product.id}-{secure_random_id('', 6)}")
+        key_record = SigningKeyModel(
+            key_id=keypair.key_id,
+            product_id=product.id,
+            version=1,
+            algorithm="Ed25519",
+            public_key_pem=keypair.public_key_pem,
+            public_key_hex=keypair.public_key_hex,
+            private_key_pem=keypair.private_key_pem or "",
+            fingerprint=keypair.fingerprint,
+            status="active",
         )
+        product.active_key_id = keypair.key_id
+        db.add(key_record)
+        db.commit()
 
     # Determine features
     features = req.features
@@ -280,13 +288,33 @@ def batch_issue_licenses(
 ):
     """Batch generate up to 10,000 licenses with bulk insertion and guaranteed uniqueness."""
     product = db.query(ProductModel).filter_by(id=req.product_id).first()
-    if not product or not product.active_key_id:
+    if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product or active signing key not found for '{req.product_id}'",
+            detail=f"Product '{req.product_id}' not found",
         )
 
-    key_record = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
+    key_record = None
+    if product.active_key_id:
+        key_record = db.query(SigningKeyModel).filter_by(key_id=product.active_key_id).first()
+
+    if not key_record:
+        keypair = generate_keypair(version=1, key_id=f"key-v1-{product.id}-{secure_random_id('', 6)}")
+        key_record = SigningKeyModel(
+            key_id=keypair.key_id,
+            product_id=product.id,
+            version=1,
+            algorithm="Ed25519",
+            public_key_pem=keypair.public_key_pem,
+            public_key_hex=keypair.public_key_hex,
+            private_key_pem=keypair.private_key_pem or "",
+            fingerprint=keypair.fingerprint,
+            status="active",
+        )
+        product.active_key_id = keypair.key_id
+        db.add(key_record)
+        db.commit()
+
     profile = ProductProfile.from_dict(json.loads(product.profile_json))
 
     now_utc = datetime.now(timezone.utc)

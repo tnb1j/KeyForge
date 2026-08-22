@@ -51,9 +51,9 @@ def init_db() -> None:
             db.add(admin_user)
             db.commit()
 
-        # Check if default desktop product exists
-        product = db.query(ProductModel).filter_by(id="desktop-app").first()
-        if not product:
+        # Ensure products have valid active signing keys (self-healing)
+        products = db.query(ProductModel).all()
+        if not products:
             profile = get_default_profile("desktop")
             keypair = generate_keypair(version=1, key_id="key-v1-desktop-init")
 
@@ -80,6 +80,29 @@ def init_db() -> None:
             db.add(db_prod)
             db.add(db_key)
             db.commit()
+        else:
+            for p in products:
+                key_exists = (
+                    db.query(SigningKeyModel).filter_by(key_id=p.active_key_id).first()
+                    if p.active_key_id
+                    else None
+                )
+                if not key_exists:
+                    keypair = generate_keypair(version=1, key_id=f"key-v1-{p.id}-auto")
+                    db_key = SigningKeyModel(
+                        key_id=keypair.key_id,
+                        product_id=p.id,
+                        version=1,
+                        algorithm="Ed25519",
+                        public_key_pem=keypair.public_key_pem,
+                        public_key_hex=keypair.public_key_hex,
+                        private_key_pem=keypair.private_key_pem or "",
+                        fingerprint=keypair.fingerprint,
+                        status="active",
+                    )
+                    p.active_key_id = keypair.key_id
+                    db.add(db_key)
+                    db.commit()
     finally:
         db.close()
 
