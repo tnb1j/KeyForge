@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeyForge | Universal License Management Console</title>
+  <link rel="stylesheet" href="/dashboard/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-name">KeyForge</div>
+      <div class="brand-badge">PRO</div>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-item active" data-view="overview">
+        <span class="nav-icon">📊</span> Overview
+      </li>
+      <li class="nav-item" data-view="products">
+        <span class="nav-icon">📦</span> Products
+      </li>
+      <li class="nav-item" data-view="licenses">
+        <span class="nav-icon">🔑</span> Licenses
+      </li>
+      <li class="nav-item" data-view="keys">
+        <span class="nav-icon">🔐</span> Key Vault
+      </li>
+      <li class="nav-item" data-view="audit">
+        <span class="nav-icon">📜</span> Audit Logs
+      </li>
+      <li class="nav-item" data-view="playground">
+        <span class="nav-icon">⚡</span> Playground
+      </li>
+    </ul>
+
+    <div class="user-panel">
+      <div class="user-info">
+        <span class="username" id="displayUsername">Admin</span>
+        <span class="user-role" id="displayRole">SUPER_ADMIN</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-wrapper">
+    <header class="header">
+      <h1 class="page-title" id="currentPageTitle">System Overview & Metrics</h1>
+      <div class="header-actions">
+        <a href="/docs" target="_blank" class="btn btn-secondary">OpenAPI Specs</a>
+        <button class="btn btn-primary" onclick="showModal('issueLicenseModal')">+ Issue License</button>
+      </div>
+    </header>
+
+    <div class="content-container">
+      
+      <!-- View: Overview -->
+      <section id="view-overview" class="view-section active">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-title">Total Licenses</span>
+            <span class="metric-value" id="metricTotalLicenses">0</span>
+            <span class="metric-sub">Across all products</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Active Licenses</span>
+            <span class="metric-value" id="metricActiveLicenses" style="color: var(--success-text);">0</span>
+            <span class="metric-sub">In good standing</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Active Devices / Seats</span>
+            <span class="metric-value" id="metricActiveDevices" style="color: var(--accent);">0</span>
+            <span class="metric-sub">Currently activated</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Expired Licenses</span>
+            <span class="metric-value" id="metricExpiredLicenses" style="color: var(--warning);">0</span>
+            <span class="metric-sub">Requires renewal</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Revoked Licenses</span>
+            <span class="metric-value" id="metricRevokedLicenses" style="color: var(--danger-text);">0</span>
+            <span class="metric-sub">Permanently disabled</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Registered Products</span>
+            <span class="metric-value" id="metricTotalProducts">0</span>
+            <span class="metric-sub">Configured applications</span>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h3>Recent Security & License Events</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event Type</th>
+                <th>Actor</th>
+                <th>License ID</th>
+                <th>Reason / Summary</th>
+                <th>Timestamp (UTC)</th>
+              </tr>
+            </thead>
+            <tbody id="recentEventsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View: Products -->
+      <section id="view-products" class="view-section">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h3>Registered Software Products</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Product ID</th>
+                <th>Version</th>
+                <th>Active Signing Key</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View: Licenses -->
+      <section id="view-licenses" class="view-section">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <input type="text" id="licenseSearchInput" class="search-input" placeholder="Search by key, customer, or ID...">
+            <button class="btn btn-primary" onclick="showModal('issueLicenseModal')">+ Issue New License</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>License Key</th>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Expires</th>
+                <th>Seats</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="licensesTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View: Keys -->
+      <section id="view-keys" class="view-section">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h3>Cryptographic Verification Key Vault (Ed25519)</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Key ID</th>
+                <th>Product ID</th>
+                <th>Version</th>
+                <th>Algorithm</th>
+                <th>Status</th>
+                <th>SHA-256 Fingerprint</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody id="keysTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View: Audit -->
+      <section id="view-audit" class="view-section">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h3>Immutable Security Audit Trail</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event Type</th>
+                <th>Actor</th>
+                <th>License ID</th>
+                <th>Product ID</th>
+                <th>Reason</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View: Playground -->
+      <section id="view-playground" class="view-section">
+        <div class="playground-box">
+          <h3>License Validation & Tamper Testing Sandbox</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
+            Test online or offline license verification, check feature entitlements, and test cryptographic tamper-resistance.
+          </p>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">License Key or Armored Token (kf1...)</label>
+              <input type="text" id="playgroundKeyInput" class="form-control" placeholder="Paste license key or compact token">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product ID</label>
+              <input type="text" id="playgroundProductInput" class="form-control" value="desktop-app">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Client Version</label>
+              <input type="text" id="playgroundVersionInput" class="form-control" value="1.0.0">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="runPlaygroundValidation()">Run Validation Check</button>
+
+          <div class="terminal-result" id="playgroundTerminal">
+Ready for validation test...
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box" style="width: 400px;">
+      <div class="modal-header">
+        <h3>Admin Authentication</h3>
+      </div>
+      <form id="loginForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" value="admin" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" value="KeyForgeAdmin2026!" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Issue License Modal -->
+  <div class="modal-overlay" id="issueLicenseModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Issue New Software License</h3>
+        <button onclick="hideModal('issueLicenseModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+      </div>
+      <form id="issueLicenseForm" onsubmit="event.preventDefault(); issueSingleLicense();">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Target Product</label>
+            <select name="product_id" id="issueProductSelect" class="form-control"></select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Customer ID</label>
+              <input type="text" name="customer_id" class="form-control" placeholder="e.g. cust_1001" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer Email</label>
+              <input type="email" name="customer_email" class="form-control" placeholder="user@example.com">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">License Type</label>
+              <select name="license_type" class="form-control">
+                <option value="subscription">Subscription</option>
+                <option value="lifetime">Lifetime</option>
+                <option value="trial">Trial</option>
+                <option value="feature">Feature Bound</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Edition</label>
+              <select name="edition" class="form-control">
+                <option value="standard">Standard</option>
+                <option value="pro">Professional</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Duration (Days)</label>
+              <input type="number" name="duration_days" class="form-control" value="365">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Max Allowed Devices</label>
+              <input type="number" name="max_devices" class="form-control" value="3">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="hideModal('issueLicenseModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Generate & Sign License</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Inspect Modal -->
+  <div class="modal-overlay" id="inspectModal">
+    <div class="modal-box" style="width: 680px;">
+      <div class="modal-header">
+        <h3>License Details & Cryptographic Claims</h3>
+        <button onclick="hideModal('inspectModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre id="inspectDetailsContent" class="terminal-result" style="margin-top: 0; max-height: 400px;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('inspectModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Renew Modal -->
+  <div class="modal-overlay" id="renewModal">
+    <div class="modal-box" style="width: 420px;">
+      <div class="modal-header">
+        <h3>Renew / Extend License</h3>
+        <button onclick="hideModal('renewModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Extension Period (Days)</label>
+          <input type="number" id="renewDaysInput" class="form-control" value="365">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('renewModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitRenew()">Confirm Renewal</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/dashboard/js/app.js"></script>
+</body>
+</html>

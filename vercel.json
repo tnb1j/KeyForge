@@ -1,27 +1,24 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/dashboard/static/css/(.*)",
-      "dest": "/keyforge/dashboard/css/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/dashboard/static/js/(.*)",
-      "dest": "/keyforge/dashboard/js/$1"
+      "source": "/docs",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/dashboard",
-      "dest": "/keyforge/dashboard/index.html"
+      "source": "/redoc",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/api/index.py"
+      "source": "/openapi.json",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/",
+      "destination": "/dashboard/index.html"
     }
   ]
 }
