@@ -3,48 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KeyForge | Universal License Management Console</title>
-  <link rel="stylesheet" href="/dashboard/static/css/dashboard.css">
+  <title>KeyForge | Developer Licensing Platform</title>
+  <link rel="stylesheet" href="/dashboard/css/dashboard.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">🛡️</div>
-      <div class="brand-name">KeyForge</div>
-      <div class="brand-badge">PRO</div>
+      <div class="brand-icon-wrapper">
+        <!-- Shield Lock SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-info">
+        <span class="brand-name">KeyForge</span>
+        <span class="brand-badge">ENTERPRISE</span>
+      </div>
     </div>
 
     <ul class="nav-links">
       <li class="nav-item active" data-view="overview">
-        <span class="nav-icon">📊</span> Overview
+        <!-- Grid / Dashboard SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="7" height="9" x="3" y="3" rx="1"/>
+          <rect width="7" height="5" x="14" y="3" rx="1"/>
+          <rect width="7" height="9" x="14" y="12" rx="1"/>
+          <rect width="7" height="5" x="3" y="16" rx="1"/>
+        </svg>
+        <span>Overview</span>
       </li>
       <li class="nav-item" data-view="products">
-        <span class="nav-icon">📦</span> Products
+        <!-- Package / Products SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m7.5 4.27 9 5.15"/>
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+          <path d="m3.3 7 8.7 5 8.7-5"/>
+          <path d="M12 22V12"/>
+        </svg>
+        <span>Products</span>
       </li>
       <li class="nav-item" data-view="licenses">
-        <span class="nav-icon">🔑</span> Licenses
+        <!-- Key SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="7.5" cy="15.5" r="5.5"/>
+          <path d="m21 2-9.6 9.6"/>
+          <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+        </svg>
+        <span>Licenses</span>
       </li>
       <li class="nav-item" data-view="keys">
-        <span class="nav-icon">🔐</span> Key Vault
+        <!-- Lock / Key Vault SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>Key Vault</span>
       </li>
       <li class="nav-item" data-view="audit">
-        <span class="nav-icon">📜</span> Audit Logs
+        <!-- Activity / Audit Trail SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        <span>Audit Trail</span>
       </li>
       <li class="nav-item" data-view="playground">
-        <span class="nav-icon">⚡</span> Playground
+        <!-- Terminal / Playground SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"/>
+          <line x1="12" x2="20" y1="19" y2="19"/>
+        </svg>
+        <span>Playground</span>
       </li>
     </ul>
 
+    <!-- User & Health Status Panel -->
     <div class="user-panel">
-      <div class="user-info">
-        <span class="username" id="displayUsername">Admin</span>
-        <span class="user-role" id="displayRole">SUPER_ADMIN</span>
+      <div class="system-status-indicator">
+        <span class="pulse-dot"></span>
+        <span>Authority Online (Ed25519)</span>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn-logout" style="color: var(--accent);" onclick="showModal('changePasswordModal')">Password</button>
-        <button class="btn-logout" onclick="logout()">Sign Out</button>
+      <div class="user-meta-row">
+        <div class="user-identity">
+          <div class="user-avatar" id="avatarLetter">A</div>
+          <div class="user-details">
+            <span class="username" id="displayUsername">Administrator</span>
+            <span class="user-role" id="displayRole">SUPER_ADMIN</span>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button class="btn-icon-panel" onclick="showModal('changePasswordModal')" title="Change Password">
+            <!-- Key / Shield SVG -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </button>
+          <button class="btn-icon-panel danger" onclick="logout()" title="Sign Out">
+            <!-- LogOut SVG -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" x2="9" y1="12" y2="12"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </aside>
@@ -52,10 +121,37 @@
   <!-- Main Content Area -->
   <main class="main-wrapper">
     <header class="header">
-      <h1 class="page-title" id="currentPageTitle">System Overview & Metrics</h1>
+      <div class="page-title-group">
+        <h1 class="page-title" id="currentPageTitle">System Overview</h1>
+        <span class="page-subtitle" id="currentPageSubtitle">Real-time metrics, license activity, and authority status</span>
+      </div>
       <div class="header-actions">
-        <a href="/docs" target="_blank" class="btn btn-secondary">OpenAPI Specs</a>
-        <button class="btn btn-primary" onclick="showModal('issueLicenseModal')">+ Issue License</button>
+        <a href="/docs" target="_blank" class="btn btn-secondary">
+          <!-- Book / API Docs SVG -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10"/>
+            <path d="M6 10h10"/>
+          </svg>
+          <span>OpenAPI Specs</span>
+        </a>
+        <button class="btn btn-secondary" onclick="showModal('batchIssueModal')">
+          <!-- Copy / Layers SVG -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <span>Batch Generate</span>
+        </button>
+        <button class="btn btn-primary" onclick="showModal('issueLicenseModal')">
+          <!-- Plus SVG -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" x2="12" y1="5" y2="19"/>
+            <line x1="5" x2="19" y1="12" y2="12"/>
+          </svg>
+          <span>Issue License</span>
+        </button>
       </div>
     </header>
 
@@ -65,32 +161,67 @@
       <section id="view-overview" class="view-section active">
         <div class="metrics-grid">
           <div class="metric-card">
-            <span class="metric-title">Total Licenses</span>
+            <div class="metric-header">
+              <span class="metric-title">Total Licenses</span>
+              <div class="metric-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              </div>
+            </div>
             <span class="metric-value" id="metricTotalLicenses">0</span>
-            <span class="metric-sub">Across all products</span>
+            <span class="metric-sub">Issued across all products</span>
           </div>
+
           <div class="metric-card">
-            <span class="metric-title">Active Licenses</span>
-            <span class="metric-value" id="metricActiveLicenses" style="color: var(--success-text);">0</span>
+            <div class="metric-header">
+              <span class="metric-title">Active Licenses</span>
+              <div class="metric-icon" style="color: var(--status-active-text); background: var(--status-active-bg);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+            </div>
+            <span class="metric-value" id="metricActiveLicenses" style="color: var(--status-active-text);">0</span>
             <span class="metric-sub">In good standing</span>
           </div>
+
           <div class="metric-card">
-            <span class="metric-title">Active Devices / Seats</span>
-            <span class="metric-value" id="metricActiveDevices" style="color: var(--accent);">0</span>
-            <span class="metric-sub">Currently activated</span>
+            <div class="metric-header">
+              <span class="metric-title">Activated Seats</span>
+              <div class="metric-icon" style="color: var(--accent-cyan); background: rgba(56, 189, 248, 0.1);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              </div>
+            </div>
+            <span class="metric-value" id="metricActiveDevices" style="color: var(--accent-cyan);">0</span>
+            <span class="metric-sub">Active hardware bindings</span>
           </div>
+
           <div class="metric-card">
-            <span class="metric-title">Expired Licenses</span>
-            <span class="metric-value" id="metricExpiredLicenses" style="color: var(--warning);">0</span>
-            <span class="metric-sub">Requires renewal</span>
+            <div class="metric-header">
+              <span class="metric-title">Expired</span>
+              <div class="metric-icon" style="color: var(--status-warning-text); background: var(--status-warning-bg);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+            <span class="metric-value" id="metricExpiredLicenses" style="color: var(--status-warning-text);">0</span>
+            <span class="metric-sub">Requires extension</span>
           </div>
+
           <div class="metric-card">
-            <span class="metric-title">Revoked Licenses</span>
-            <span class="metric-value" id="metricRevokedLicenses" style="color: var(--danger-text);">0</span>
+            <div class="metric-header">
+              <span class="metric-title">Revoked</span>
+              <div class="metric-icon" style="color: var(--status-danger-text); background: var(--status-danger-bg);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+              </div>
+            </div>
+            <span class="metric-value" id="metricRevokedLicenses" style="color: var(--status-danger-text);">0</span>
             <span class="metric-sub">Permanently disabled</span>
           </div>
+
           <div class="metric-card">
-            <span class="metric-title">Registered Products</span>
+            <div class="metric-header">
+              <span class="metric-title">Products</span>
+              <div class="metric-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+            </div>
             <span class="metric-value" id="metricTotalProducts">0</span>
             <span class="metric-sub">Configured applications</span>
           </div>
@@ -98,22 +229,27 @@
 
         <div class="table-card">
           <div class="table-toolbar">
-            <h3>Recent Security & License Events</h3>
+            <span class="table-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Recent Security & Lifecycle Events
+            </span>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Event Type</th>
-                <th>Actor</th>
-                <th>License ID</th>
-                <th>Reason / Summary</th>
-                <th>Timestamp (UTC)</th>
-              </tr>
-            </thead>
-            <tbody id="recentEventsTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Event Type</th>
+                  <th>Actor</th>
+                  <th>License ID</th>
+                  <th>Reason / Context</th>
+                  <th>Timestamp (UTC)</th>
+                </tr>
+              </thead>
+              <tbody id="recentEventsTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -121,22 +257,27 @@
       <section id="view-products" class="view-section">
         <div class="table-card">
           <div class="table-toolbar">
-            <h3>Registered Software Products</h3>
+            <span class="table-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Registered Products & Key Authority
+            </span>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>Product ID</th>
-                <th>Version</th>
-                <th>Active Signing Key</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="productsTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Product ID</th>
+                  <th>Version</th>
+                  <th>Active Signing Key</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -144,26 +285,34 @@
       <section id="view-licenses" class="view-section">
         <div class="table-card">
           <div class="table-toolbar">
-            <input type="text" id="licenseSearchInput" class="search-input" placeholder="Search by key, customer, or ID...">
-            <button class="btn btn-primary" onclick="showModal('issueLicenseModal')">+ Issue New License</button>
+            <div class="table-search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+              <input type="text" id="licenseSearchInput" class="search-input" placeholder="Search by key, customer, or ID...">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-secondary btn-sm" onclick="showModal('batchIssueModal')">Batch Generate</button>
+              <button class="btn btn-primary btn-sm" onclick="showModal('issueLicenseModal')">+ Issue Single License</button>
+            </div>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>License Key</th>
-                <th>Product</th>
-                <th>Customer</th>
-                <th>Status</th>
-                <th>Expires</th>
-                <th>Seats</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="licensesTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>License Key</th>
+                  <th>Product</th>
+                  <th>Customer</th>
+                  <th>Status</th>
+                  <th>Expires</th>
+                  <th>Seats</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="licensesTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -171,24 +320,29 @@
       <section id="view-keys" class="view-section">
         <div class="table-card">
           <div class="table-toolbar">
-            <h3>Cryptographic Verification Key Vault (Ed25519)</h3>
+            <span class="table-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Cryptographic Verification Key Vault (Ed25519)
+            </span>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Key ID</th>
-                <th>Product ID</th>
-                <th>Version</th>
-                <th>Algorithm</th>
-                <th>Status</th>
-                <th>SHA-256 Fingerprint</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody id="keysTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Key ID</th>
+                  <th>Product ID</th>
+                  <th>Version</th>
+                  <th>Algorithm</th>
+                  <th>Status</th>
+                  <th>SHA-256 Fingerprint</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody id="keysTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -196,32 +350,40 @@
       <section id="view-audit" class="view-section">
         <div class="table-card">
           <div class="table-toolbar">
-            <h3>Immutable Security Audit Trail</h3>
+            <span class="table-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Immutable Security Audit Trail
+            </span>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Event Type</th>
-                <th>Actor</th>
-                <th>License ID</th>
-                <th>Product ID</th>
-                <th>Reason</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody id="auditTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Event Type</th>
+                  <th>Actor</th>
+                  <th>License ID</th>
+                  <th>Product ID</th>
+                  <th>Reason</th>
+                  <th>Timestamp (UTC)</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <!-- View: Playground -->
       <section id="view-playground" class="view-section">
         <div class="playground-box">
-          <h3>License Validation & Tamper Testing Sandbox</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
-            Test online or offline license verification, check feature entitlements, and test cryptographic tamper-resistance.
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+            <h3 style="font-size: 16px; font-weight: 700;">License Validation & Tamper Sandbox</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 13.5px;">
+            Test online or offline license verification, check feature entitlements, and test cryptographic tamper-resistance against the live authority.
           </p>
 
           <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
@@ -239,7 +401,10 @@
             </div>
           </div>
 
-          <button class="btn btn-primary" onclick="runPlaygroundValidation()">Run Validation Check</button>
+          <button class="btn btn-primary" onclick="runPlaygroundValidation()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Execute Cryptographic Check</span>
+          </button>
 
           <div class="terminal-result" id="playgroundTerminal">
 Ready for validation test...
@@ -252,9 +417,14 @@ Ready for validation test...
 
   <!-- Login Modal -->
   <div class="modal-overlay" id="loginModal">
-    <div class="modal-box" style="width: 400px;">
+    <div class="modal-box" style="width: 420px;">
       <div class="modal-header">
-        <h3>Admin Authentication</h3>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="brand-icon-wrapper" style="width: 28px; height: 28px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="modal-title">Admin Authentication</h3>
+        </div>
       </div>
       <form id="loginForm">
         <div class="modal-body">
@@ -276,10 +446,12 @@ Ready for validation test...
 
   <!-- Change Password Modal -->
   <div class="modal-overlay" id="changePasswordModal">
-    <div class="modal-box" style="width: 400px;">
+    <div class="modal-box" style="width: 420px;">
       <div class="modal-header">
-        <h3>Change Admin Password</h3>
-        <button onclick="hideModal('changePasswordModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+        <h3 class="modal-title">Change Admin Password</h3>
+        <button class="modal-close-btn" onclick="hideModal('changePasswordModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
       </div>
       <form id="changePasswordForm" onsubmit="event.preventDefault(); submitChangePassword();">
         <div class="modal-body">
@@ -301,12 +473,14 @@ Ready for validation test...
     </div>
   </div>
 
-  <!-- Issue License Modal -->
+  <!-- Issue Single License Modal -->
   <div class="modal-overlay" id="issueLicenseModal">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Issue New Software License</h3>
-        <button onclick="hideModal('issueLicenseModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+        <h3 class="modal-title">Issue New Software License</h3>
+        <button class="modal-close-btn" onclick="hideModal('issueLicenseModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
       </div>
       <form id="issueLicenseForm" onsubmit="event.preventDefault(); issueSingleLicense();">
         <div class="modal-body">
@@ -363,15 +537,69 @@ Ready for validation test...
     </div>
   </div>
 
+  <!-- Batch Issue Modal -->
+  <div class="modal-overlay" id="batchIssueModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Batch License Key Generator</h3>
+        <button class="modal-close-btn" onclick="hideModal('batchIssueModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="batchIssueForm" onsubmit="event.preventDefault(); issueBatchLicenses();">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Target Product</label>
+            <select name="product_id" id="batchProductSelect" class="form-control"></select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Quantity to Issue (1 - 50)</label>
+              <input type="number" name="count" class="form-control" value="10" min="1" max="50" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer Prefix</label>
+              <input type="text" name="customer_prefix" class="form-control" value="bulk_cust" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">License Type</label>
+              <select name="license_type" class="form-control">
+                <option value="subscription">Subscription</option>
+                <option value="lifetime">Lifetime</option>
+                <option value="trial">Trial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Edition</label>
+              <select name="edition" class="form-control">
+                <option value="standard">Standard</option>
+                <option value="pro" selected>Professional</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="hideModal('batchIssueModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Generate Batch Keys</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Inspect Modal -->
   <div class="modal-overlay" id="inspectModal">
-    <div class="modal-box" style="width: 680px;">
+    <div class="modal-box" style="width: 720px;">
       <div class="modal-header">
-        <h3>License Details & Cryptographic Claims</h3>
-        <button onclick="hideModal('inspectModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+        <h3 class="modal-title">License Details & Cryptographic Claims</h3>
+        <button class="modal-close-btn" onclick="hideModal('inspectModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
       </div>
       <div class="modal-body">
-        <pre id="inspectDetailsContent" class="terminal-result" style="margin-top: 0; max-height: 400px;"></pre>
+        <pre id="inspectDetailsContent" class="terminal-result" style="margin-top: 0; max-height: 420px;"></pre>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="hideModal('inspectModal')">Close</button>
@@ -383,8 +611,10 @@ Ready for validation test...
   <div class="modal-overlay" id="renewModal">
     <div class="modal-box" style="width: 420px;">
       <div class="modal-header">
-        <h3>Renew / Extend License</h3>
-        <button onclick="hideModal('renewModal')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">&times;</button>
+        <h3 class="modal-title">Renew License Period</h3>
+        <button class="modal-close-btn" onclick="hideModal('renewModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -399,6 +629,6 @@ Ready for validation test...
     </div>
   </div>
 
-  <script src="/dashboard/static/js/app.js"></script>
+  <script src="/dashboard/js/app.js"></script>
 </body>
 </html>
