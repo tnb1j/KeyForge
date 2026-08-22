@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/dashboard/static/css/(.*)",
+      "dest": "/keyforge/dashboard/css/$1"
+    },
+    {
+      "src": "/dashboard/static/js/(.*)",
+      "dest": "/keyforge/dashboard/js/$1"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/keyforge/dashboard/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ]
+}

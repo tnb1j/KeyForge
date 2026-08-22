@@ -185,5 +185,23 @@ python -m pytest tests/ -v
 * [Configuration & Profiles Guide](docs/CONFIGURATION_GUIDE.md)
 * [Client Integration Guide](docs/CLIENT_INTEGRATION_GUIDE.md)
 * [Offline Licensing Specification](docs/OFFLINE_LICENSING.md)
+* [Vercel 100% Free-Tier Deployment Guide](docs/VERCEL_DEPLOYMENT.md)
 * [Deployment & Disaster Recovery Guide](docs/DEPLOYMENT_AND_RECOVERY.md)
 * [Security Audit Checklist](docs/SECURITY_AUDIT_CHECKLIST.md)
+
+---
+
+## ☁️ 100% Free-Tier Vercel Deployment
+
+Deploy KeyForge directly to Vercel with a free serverless cloud PostgreSQL database (Neon or Supabase):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tnb1j/KeyForge&env=KEYFORGE_DB_URL,KEYFORGE_JWT_SECRET,KEYFORGE_ADMIN_USER,KEYFORGE_ADMIN_PASS)
+
+See the complete step-by-step guide in [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md).
+
+---
+
+## 📄 License
+
+This project is open source software licensed under the **[MIT License](LICENSE)**.
+Copyright (c) 2026 tnb1j (KeyForge Architecture Team).
