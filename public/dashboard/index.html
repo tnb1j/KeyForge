@@ -283,6 +283,7 @@ Ready for validation test...
       </div>
       <form id="changePasswordForm" onsubmit="event.preventDefault(); submitChangePassword();">
         <div class="modal-body">
+          <input type="text" name="username" value="admin" autocomplete="username" style="display: none;" aria-hidden="true">
           <div class="form-group">
             <label class="form-label">Current Password</label>
             <input type="password" id="currentPasswordInput" class="form-control" placeholder="Enter current password" autocomplete="current-password" required>
