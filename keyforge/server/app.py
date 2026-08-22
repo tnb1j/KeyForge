@@ -57,14 +57,24 @@ app.add_middleware(
 )
 
 
-# Security Headers Middleware
+# Security Headers and Serverless Path Normalization Middleware
 @app.middleware("http")
-async def add_security_headers(request: Request, call_next):
-    # Normalize serverless /v1 paths if /api was stripped by gateway
-    if request.scope.get("path", "").startswith("/v1/"):
-        request.scope["path"] = "/api" + request.scope["path"]
-    elif request.scope.get("path", "").startswith("/auth/"):
-        request.scope["path"] = "/api/v1" + request.scope["path"]
+async def handle_serverless_path_and_security_headers(request: Request, call_next):
+    # 1. Restore original client request path if flattened by Vercel serverless rewrite
+    current_path = request.scope.get("path", "")
+    forwarded = request.headers.get("x-forwarded-uri") or request.headers.get("x-matched-path")
+    
+    if forwarded and (current_path in ("/api", "/api/", "/api/index.py", "/", "")):
+        extracted_path = forwarded.split("?")[0]
+        if extracted_path:
+            request.scope["path"] = extracted_path
+
+    # 2. Normalize serverless path prefixes
+    p = request.scope.get("path", "")
+    if p.startswith("/v1/"):
+        request.scope["path"] = "/api" + p
+    elif p.startswith("/auth/"):
+        request.scope["path"] = "/api/v1" + p
 
     response: Response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
