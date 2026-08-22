@@ -33,6 +33,30 @@ func NewClient(productID string, serverURL string, pubKey ed25519.PublicKey) *Cl
 	}
 }
 
+// LicensePayload represents the claims embedded in a license.
+type LicensePayload struct {
+	SchemaVersion int                    `json:"schema_version"`
+	LicenseID     string                 `json:"license_id"`
+	LicenseKey    string                 `json:"license_key"`
+	ProductID     string                 `json:"product_id"`
+	LicenseType   string                 `json:"license_type"`
+	Edition       string                 `json:"edition"`
+	CustomerID    string                 `json:"customer_id"`
+	Features      []string               `json:"features"`
+	ExpiresAt     string                 `json:"expires_at"`
+	MaxDevices    int                    `json:"max_devices"`
+	Metadata      map[string]interface{} `json:"metadata"`
+}
+
+// ParsedToken represents an unpacked armored token.
+type ParsedToken struct {
+	SchemaVersion int
+	KeyID         string
+	Algorithm     string
+	Payload       LicensePayload
+	Signature     []byte
+}
+
 // ValidationResult represents the output of a validation check.
 type ValidationResult struct {
 	IsValid       bool     `json:"is_valid"`
@@ -57,6 +81,42 @@ func (v *ValidationResult) HasFeature(featureName string) bool {
 		}
 	}
 	return false
+}
+
+// ParseArmoredToken parses a kf1.payload.sig.keyid string.
+func ParseArmoredToken(token string) (*ParsedToken, error) {
+	parts := strings.Split(strings.TrimSpace(token), ".")
+	if len(parts) != 4 || parts[0] != "kf1" {
+		return nil, errors.New("invalid KeyForge armored token structure")
+	}
+
+	payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode payload: %w", err)
+	}
+
+	var payload LicensePayload
+	if err := json.Unmarshal(payloadBytes, &payload); err != nil {
+		return nil, fmt.Errorf("failed to parse payload JSON: %w", err)
+	}
+
+	sigBytes, err := base64.RawURLEncoding.DecodeString(parts[2])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode signature: %w", err)
+	}
+
+	keyIDBytes, err := base64.RawURLEncoding.DecodeString(parts[3])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode key ID: %w", err)
+	}
+
+	return &ParsedToken{
+		SchemaVersion: 1,
+		KeyID:         string(keyIDBytes),
+		Algorithm:     "Ed25519",
+		Payload:       payload,
+		Signature:     sigBytes,
+	}, nil
 }
 
 // ValidateOnline queries the KeyForge REST endpoint.
