@@ -125,3 +125,37 @@ def generate_api_key(
         created_at=datetime.now(timezone.utc).isoformat(),
         warning="Save this API key now; it cannot be displayed again.",
     )
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@router.post("/change-password")
+def change_password(
+    req: ChangePasswordRequest,
+    current_user: AdminUserModel = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Change the authenticated administrator's password."""
+    if not verify_password(req.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+    if len(req.new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 8 characters long",
+        )
+    current_user.password_hash = hash_password(req.new_password)
+    db.commit()
+    log_audit_event(
+        db=db,
+        event_type="auth.password_changed",
+        actor_id=current_user.username,
+        actor_type="admin",
+        reason="Password changed by user",
+    )
+    return {"success": True, "message": "Password changed successfully"}

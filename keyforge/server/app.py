@@ -60,6 +60,12 @@ app.add_middleware(
 # Security Headers Middleware
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    # Normalize serverless /v1 paths if /api was stripped by gateway
+    if request.scope.get("path", "").startswith("/v1/"):
+        request.scope["path"] = "/api" + request.scope["path"]
+    elif request.scope.get("path", "").startswith("/auth/"):
+        request.scope["path"] = "/api/v1" + request.scope["path"]
+
     response: Response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"

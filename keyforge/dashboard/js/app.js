@@ -430,6 +430,24 @@ async function runPlaygroundValidation() {
   }
 }
 
+// Change Password
+async function submitChangePassword() {
+  const current_password = document.getElementById('currentPasswordInput').value;
+  const new_password = document.getElementById('newPasswordInput').value;
+
+  try {
+    await api('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password, new_password }),
+    });
+    hideModal('changePasswordModal');
+    document.getElementById('changePasswordForm').reset();
+    alert('Password updated successfully! Please keep your new password in a safe place.');
+  } catch (err) {
+    alert(`Failed to update password: ${err.message}`);
+  }
+}
+
 // Initialization
 async function loadDashboard() {
   await loadOverview();
