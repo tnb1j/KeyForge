@@ -1,0 +1,19 @@
+{
+  "name": "@keyforge/client",
+  "version": "1.0.0",
+  "description": "KeyForge Universal Licensing Client for Node.js and TypeScript applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "licensing",
+    "license-key",
+    "ed25519",
+    "drm",
+    "software-activation",
+    "offline-licensing"
+  ],
+  "author": "KeyForge Architecture Team",
+  "license": "MIT"
+}

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  keyforge-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: keyforge-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - KEYFORGE_ENV=production
+      - KEYFORGE_DB_URL=sqlite:////data/keyforge.db
+      - KEYFORGE_JWT_SECRET=change-this-to-a-secure-secret-in-production-vault
+      - KEYFORGE_ADMIN_USER=admin
+      - KEYFORGE_ADMIN_PASS=KeyForgeSecureAdmin2026!
+    volumes:
+      - keyforge-data:/data
+
+volumes:
+  keyforge-data:
+    driver: local
