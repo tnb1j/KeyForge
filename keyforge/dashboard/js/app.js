@@ -81,7 +81,15 @@ async function api(endpoint, options = {}) {
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(data.detail || `Request failed with status ${res.status}`);
+      let msg = `Request failed with status ${res.status}`;
+      if (typeof data.detail === 'string') {
+        msg = data.detail;
+      } else if (Array.isArray(data.detail)) {
+        msg = data.detail.map(d => `${d.loc ? d.loc.slice(-1)[0] + ': ' : ''}${d.msg}`).join(', ');
+      } else if (data.message) {
+        msg = data.message;
+      }
+      throw new Error(msg);
     }
     return data;
   } catch (err) {
@@ -424,25 +432,24 @@ async function issueBatchLicenses() {
   const type = form.license_type.value;
   const edition = form.edition.value;
 
-  const items = [];
-  for (let i = 1; i <= count; i++) {
-    items.push({
-      product_id: prodId,
-      customer_id: `${prefix}_${String(i).padStart(3, '0')}`,
-      license_type: type,
-      edition: edition,
-      duration_days: 365,
-      max_devices: 3,
-    });
-  }
+  const body = {
+    product_id: prodId,
+    quantity: count,
+    customer_id_prefix: prefix,
+    license_type: type,
+    edition: edition,
+    duration_days: 365,
+    max_devices: 3,
+  };
 
   try {
     const res = await api('/licenses/batch', {
       method: 'POST',
-      body: JSON.stringify({ items }),
+      body: JSON.stringify(body),
     });
     hideModal('batchIssueModal');
-    showToast(`Generated ${res.count} licenses successfully!`, 'success');
+    form.reset();
+    showToast(`Generated ${res.quantity} licenses successfully!`, 'success');
     loadLicenses();
     loadOverview();
 

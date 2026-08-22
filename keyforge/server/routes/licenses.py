@@ -397,8 +397,8 @@ def batch_issue_licenses(
     return {
         "quantity": req.quantity,
         "product_id": req.product_id,
-        "licenses": [lic.to_dict(include_token=False) for lic in created_licenses[:20]],
-        "message": f"Successfully issued {req.quantity} licenses (showing first {min(20, req.quantity)})",
+        "licenses": [lic.to_dict(include_token=True) for lic in created_licenses],
+        "message": f"Successfully issued {req.quantity} licenses",
     }
 
 
