@@ -316,7 +316,8 @@ async function loadLicenses() {
                 ? `<button class="btn btn-secondary btn-sm" onclick="reactivateLicense('${lic.id}')">Reactivate</button>`
                 : ''
             }
-            ${lic.status !== 'revoked' ? `<button class="btn btn-danger btn-sm" onclick="revokeLicense('${lic.id}')">Revoke</button>` : ''}
+            ${lic.status !== 'revoked' ? `<button class="btn btn-secondary btn-sm" onclick="revokeLicense('${lic.id}')">Revoke</button>` : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteLicense('${lic.id}')" title="Permanently Delete">Delete</button>
           </div>
         </td>
       `;
@@ -516,6 +517,31 @@ async function revokeLicense(id) {
     loadOverview();
   } catch (err) {
     showToast(`Failed to revoke: ${err.message}`, 'error');
+  }
+}
+
+async function deleteLicense(id) {
+  if (!confirm(`Are you sure you want to permanently delete license '${id}'? This will remove all associated activations and cannot be undone.`)) return;
+  try {
+    await api(`/licenses/${id}`, { method: 'DELETE' });
+    showToast(`License ${id} permanently deleted`, 'info');
+    loadLicenses();
+    loadOverview();
+  } catch (err) {
+    showToast(`Failed to delete license: ${err.message}`, 'error');
+  }
+}
+
+async function purgeAllLicenses() {
+  const confirmText = prompt('Type "PURGE" to permanently delete ALL issued licenses and device activations:');
+  if (confirmText !== 'PURGE') return;
+  try {
+    const res = await api('/licenses/purge-all', { method: 'POST' });
+    showToast(res.message, 'success');
+    loadLicenses();
+    loadOverview();
+  } catch (err) {
+    showToast(`Purge failed: ${err.message}`, 'error');
   }
 }
 

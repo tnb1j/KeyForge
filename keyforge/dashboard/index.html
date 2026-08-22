@@ -290,6 +290,10 @@
               <input type="text" id="licenseSearchInput" class="search-input" placeholder="Search by key, customer, or ID...">
             </div>
             <div class="btn-group">
+              <button class="btn btn-danger btn-sm" onclick="purgeAllLicenses()" title="Purge all test licenses for a clean slate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px; height:13px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                Purge All
+              </button>
               <button class="btn btn-secondary btn-sm" onclick="showModal('batchIssueModal')">Batch Generate</button>
               <button class="btn btn-primary btn-sm" onclick="showModal('issueLicenseModal')">+ Issue Single License</button>
             </div>

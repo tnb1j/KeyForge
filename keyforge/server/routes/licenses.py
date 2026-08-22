@@ -672,3 +672,73 @@ def export_license(
         }
 
     return lic.to_dict(include_token=True)
+
+
+@router.delete("/{license_id}", status_code=status.HTTP_200_OK)
+def delete_license(
+    license_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: AdminUserModel = Depends(require_roles("SUPER_ADMIN")),
+):
+    """Permanently delete a single license and its associated device activations."""
+    lic = db.query(LicenseModel).filter(
+        (LicenseModel.id == license_id) | (LicenseModel.license_key_raw == license_id)
+    ).first()
+    if not lic:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="License not found")
+
+    # Delete activations first
+    db.query(ActivationModel).filter_by(license_id=lic.id).delete()
+
+    # Log audit event before deletion
+    log_audit_event(
+        db=db,
+        event_type="license.deleted",
+        actor_id=current_user.username,
+        license_id=lic.id,
+        product_id=lic.product_id,
+        ip_address=request.client.host if request.client else None,
+        reason=f"Permanently deleted license {lic.id} ({lic.license_key_masked})",
+    )
+
+    db.delete(lic)
+    db.commit()
+
+    return {"message": f"License {license_id} deleted permanently", "deleted_id": license_id}
+
+
+@router.post("/purge-all", status_code=status.HTTP_200_OK)
+def purge_all_licenses(
+    request: Request,
+    product_id: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: AdminUserModel = Depends(require_roles("SUPER_ADMIN")),
+):
+    """Permanently purge all issued licenses and device activations for a fresh start."""
+    lic_query = db.query(LicenseModel)
+    act_query = db.query(ActivationModel)
+
+    if product_id:
+        lic_query = lic_query.filter_by(product_id=product_id)
+        act_query = act_query.filter_by(product_id=product_id)
+
+    deleted_acts = act_query.delete(synchronize_session=False)
+    deleted_lics = lic_query.delete(synchronize_session=False)
+
+    log_audit_event(
+        db=db,
+        event_type="licenses.purged",
+        actor_id=current_user.username,
+        product_id=product_id,
+        ip_address=request.client.host if request.client else None,
+        reason=f"Purged {deleted_lics} licenses and {deleted_acts} device activations for clean slate",
+    )
+
+    db.commit()
+
+    return {
+        "message": f"Purged {deleted_lics} licenses and {deleted_acts} activations successfully.",
+        "deleted_licenses": deleted_lics,
+        "deleted_activations": deleted_acts,
+    }
