@@ -93,7 +93,7 @@ python -m keyforge.cli serve --port 8000
 ```
 * **Interactive Admin Dashboard**: [http://127.0.0.1:8000/dashboard](http://127.0.0.1:8000/dashboard)
 * **Interactive OpenAPI Swagger**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-* **Default Admin Credentials**: `admin` / `KeyForgeAdmin2026!`
+* **Admin Credentials**: Configured via your private environment variables (`KEYFORGE_ADMIN_USER` and `KEYFORGE_ADMIN_PASS`).
 
 ---
 
