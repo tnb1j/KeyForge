@@ -19,6 +19,15 @@ def _default_db_url() -> str:
     return "sqlite:///./keyforge.db"
 
 
+def _default_admin_password() -> str:
+    pass_val = os.getenv("KEYFORGE_ADMIN_PASS")
+    if pass_val:
+        return pass_val
+    if os.getenv("KEYFORGE_ENV") == "production" or "VERCEL" in os.environ:
+        return secrets.token_urlsafe(16)
+    return "KeyForgeAdmin2026!"
+
+
 class ServerSettings(BaseModel):
     """Global configuration settings for KeyForge Server."""
 
@@ -36,9 +45,7 @@ class ServerSettings(BaseModel):
     admin_default_username: str = Field(
         default_factory=lambda: os.getenv("KEYFORGE_ADMIN_USER", "admin")
     )
-    admin_default_password: str = Field(
-        default_factory=lambda: os.getenv("KEYFORGE_ADMIN_PASS", "KeyForgeAdmin2026!")
-    )
+    admin_default_password: str = Field(default_factory=_default_admin_password)
     rate_limit_enabled: bool = Field(default=True)
     rate_limit_validate_rpm: int = Field(default=120)  # 120 per min per IP
     rate_limit_activate_rpm: int = Field(default=30)   # 30 per min per IP
