@@ -11,12 +11,12 @@ def setup_db():
     init_db()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def client():
     return TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def admin_token(client):
     res = client.post(
         "/api/v1/auth/login",
@@ -126,3 +126,62 @@ def test_license_lifecycle_suspend_reactivate_renew_revoke(client, admin_token):
     )
     assert rev_res.status_code == 200
     assert rev_res.json()["status"] == "revoked"
+
+
+def test_delete_license(client, admin_token):
+    # Issue a disposable license
+    issue_res = client.post(
+        "/api/v1/licenses",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={
+            "product_id": "desktop-app",
+            "customer_id": "cust_disposable",
+            "duration_days": 10,
+        },
+    )
+    lic_id = issue_res.json()["id"]
+
+    # Delete it
+    del_res = client.delete(
+        f"/api/v1/licenses/{lic_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert del_res.status_code == 200
+    assert del_res.json()["deleted_id"] == lic_id
+
+    # Verify 404 on get
+    get_res = client.get(
+        f"/api/v1/licenses/{lic_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert get_res.status_code == 404
+
+
+def test_purge_all_licenses(client, admin_token):
+    # Issue multiple test licenses
+    for i in range(3):
+        client.post(
+            "/api/v1/licenses",
+            headers={"Authorization": f"Bearer {admin_token}"},
+            json={
+                "product_id": "desktop-app",
+                "customer_id": f"cust_purge_{i}",
+                "duration_days": 10,
+            },
+        )
+
+    # Purge all
+    purge_res = client.post(
+        "/api/v1/licenses/purge-all",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert purge_res.status_code == 200
+    assert "deleted_licenses" in purge_res.json()
+
+    # List licenses should be empty
+    list_res = client.get(
+        "/api/v1/licenses",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert list_res.status_code == 200
+    assert list_res.json()["total"] == 0

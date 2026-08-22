@@ -11,12 +11,12 @@ def setup_db():
     init_db()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def client():
     return TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def admin_token(client):
     res = client.post(
         "/api/v1/auth/login",
